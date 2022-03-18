@@ -10,7 +10,11 @@ export default class MyStack extends sst.Stack {
         srcPath: "src/Api",
       },
       routes: {
-        "POST /templates": "Api::Api.TemplateHandler::CreateTemplates"
+        "POST    /templates": "Api::Api.TemplateHandler::CreateTemplates",
+        "PUT     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::UpdateTemplates",
+        "Delete  /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DeleteTemplates",
+        "Get     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DetailsTemplates",
+        "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates"
       }
     });
 
