@@ -3,18 +3,36 @@ using System.Net;
 
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
-
+using System;
+using Amazon.DynamoDBv2;
+using Amazon;
+using Amazon.DynamoDBv2.DataModel;
+using System.Threading.Tasks;
 
 namespace Api
 {
     public class TemplateHandler
     {
-        public APIGatewayHttpApiV2ProxyResponse CreateTemplates(APIGatewayHttpApiV2ProxyRequest request)
+        private static AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+        public async Task<APIGatewayHttpApiV2ProxyResponse> CreateTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
+            Template template = new Template
+            {
+                TemplateId = Guid.NewGuid().ToString(),
+                UserId = Guid.NewGuid().ToString(),
+                Name = "Initial Template",
+                Text = "Hi From Satish"
+            };
+            await dynamoDBContext.SaveAsync(template,new DynamoDBOperationConfig
+            {
+                OverrideTableName = TableName,
+            });
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Create Templates for Message - {request.RequestContext.Time}.",
+                Body = $"Create Templates for Message and it will be stored in - {TableName}.",
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }

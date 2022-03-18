@@ -3,10 +3,16 @@ import * as sst from "@serverless-stack/resources";
 export default class MyStack extends sst.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
+    
+    const { table } = props;
+
 
     // Create a HTTP API
     const api = new sst.Api(this, "Api", {
       defaultFunctionProps: {
+        environment:{
+          TABLE_NAME: table.tableName,
+        },
         srcPath: "src/Api",
       },
       routes: {
