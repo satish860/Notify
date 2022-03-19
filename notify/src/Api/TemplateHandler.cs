@@ -8,6 +8,7 @@ using Amazon.DynamoDBv2;
 using Amazon;
 using Amazon.DynamoDBv2.DataModel;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Api
 {
@@ -16,14 +17,15 @@ namespace Api
         private static AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
         public async Task<APIGatewayHttpApiV2ProxyResponse> CreateTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var serializer = JsonSerializer.Deserialize<Template>(request.Body);
             DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
             var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
             Template template = new Template
             {
                 TemplateId = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                Name = "Initial Template",
-                Text = "Hi From Satish"
+                Name = serializer.Name,
+                Text = serializer.Text,
             };
             await dynamoDBContext.SaveAsync(template,new DynamoDBOperationConfig
             {
@@ -32,7 +34,7 @@ namespace Api
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Create Templates for Message and it will be stored in - {TableName}.",
+                Body = JsonSerializer.Serialize(template),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
