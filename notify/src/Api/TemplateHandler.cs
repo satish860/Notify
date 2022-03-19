@@ -9,6 +9,7 @@ using Amazon;
 using Amazon.DynamoDBv2.DataModel;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Amazon.DynamoDBv2.DocumentModel;
 
 namespace Api
 {
@@ -27,7 +28,7 @@ namespace Api
                 Name = serializer.Name,
                 Text = serializer.Text,
             };
-            await dynamoDBContext.SaveAsync(template,new DynamoDBOperationConfig
+            await dynamoDBContext.SaveAsync(template, new DynamoDBOperationConfig
             {
                 OverrideTableName = TableName,
             });
@@ -69,12 +70,26 @@ namespace Api
             };
         }
 
-        public APIGatewayHttpApiV2ProxyResponse ListTemplates(APIGatewayHttpApiV2ProxyRequest request)
+        public async Task<APIGatewayHttpApiV2ProxyResponse> ListTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var userId = request.PathParameters["user_id"];
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
+            var searchResult = dynamoDBContext.QueryAsync<Template>(userId, new DynamoDBOperationConfig
+            {
+                OverrideTableName = TableName,
+            });
+            var templates = new List<Template>();
+            do
+            {
+                List<Template> nextSet = await searchResult.GetNextSetAsync();
+                templates.AddRange(nextSet);
+            }
+            while (!searchResult.IsDone);
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = $"List Templates for Message - {request.RequestContext.Time}.",
+                Body = JsonSerializer.Serialize(templates),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
