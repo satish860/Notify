@@ -52,6 +52,19 @@ namespace Api
 
         public APIGatewayHttpApiV2ProxyResponse DeleteTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var userId = request.PathParameters["user_id"];
+            var templateId = request.PathParameters["template_id"];
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
+            Template template = new Template
+            {
+                UserId = userId,
+                TemplateId = templateId,
+            };
+            dynamoDBContext.DeleteAsync(template, new DynamoDBOperationConfig
+            {
+                OverrideTableName = TableName,
+            });
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
