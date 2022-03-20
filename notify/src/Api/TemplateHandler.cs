@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-
-using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using System;
 using Amazon.DynamoDBv2;
@@ -9,7 +7,6 @@ using Amazon;
 using Amazon.DynamoDBv2.DataModel;
 using System.Threading.Tasks;
 using System.Text.Json;
-using Amazon.DynamoDBv2.DocumentModel;
 
 namespace Api
 {
@@ -67,18 +64,29 @@ namespace Api
             });
             return new APIGatewayHttpApiV2ProxyResponse
             {
-                StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Delete Templates for Message - {request.RequestContext.Time}.",
-                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
+                StatusCode = (int)HttpStatusCode.NoContent,
             };
         }
 
-        public APIGatewayHttpApiV2ProxyResponse DetailsTemplates(APIGatewayHttpApiV2ProxyRequest request)
+        public async Task<APIGatewayHttpApiV2ProxyResponse> DetailsTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var userId = request.PathParameters["user_id"];
+            var templateId = request.PathParameters["template_id"];
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
+            Template template = new Template
+            {
+                UserId = userId,
+                TemplateId = templateId,
+            };
+           var templateDetails = await dynamoDBContext.LoadAsync<Template>(template, new DynamoDBOperationConfig
+            {
+                OverrideTableName = TableName,
+            });
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Details Templates for Message - {request.RequestContext.Time}.",
+                Body = JsonSerializer.Serialize(templateDetails),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
