@@ -22,10 +22,10 @@ export default class MyStack extends sst.Stack {
         "Delete  /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DeleteTemplates",
         "Get     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DetailsTemplates",
         "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates",
-        "Get     /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl"
+        "POST    /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl" 
       }
     });
-
+    api.attachPermissions([bucket])
     // Show the endpoint in the output
     this.addOutputs({
       "ApiEndpoint": api.url,
