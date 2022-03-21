@@ -4,7 +4,7 @@ export default class MyStack extends sst.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
     
-    const { table } = props;
+    const { table,bucket } = props;
 
 
     // Create a HTTP API
@@ -12,6 +12,7 @@ export default class MyStack extends sst.Stack {
       defaultFunctionProps: {
         environment:{
           TABLE_NAME: table.tableName,
+          BUCKET_NAME: bucket.bucketName
         },
         srcPath: "src/Api",
       },
@@ -20,7 +21,8 @@ export default class MyStack extends sst.Stack {
         "PUT     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::UpdateTemplates",
         "Delete  /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DeleteTemplates",
         "Get     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DetailsTemplates",
-        "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates"
+        "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates",
+        "Get     /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl"
       }
     });
 

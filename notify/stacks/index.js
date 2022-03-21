@@ -10,6 +10,7 @@ export default function main(app) {
   const storageStack = new StorageStack(app, "storage");
   new MyStack(app, "my-stack",{
     table: storageStack.table,
+    bucket: storageStack.bucket
   });
 
   // Add more stacks
