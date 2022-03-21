@@ -12,9 +12,15 @@ namespace Api
 {
     public class TemplateHandler
     {
-        private static AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+        private readonly AmazonDynamoDBClient client;
+        public TemplateHandler()
+        {
+            client = new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+        }
+       
         public async Task<APIGatewayHttpApiV2ProxyResponse> CreateTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+
             var serializer = JsonSerializer.Deserialize<Template>(request.Body);
             DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
             var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
@@ -37,12 +43,19 @@ namespace Api
             };
         }
 
-        public APIGatewayHttpApiV2ProxyResponse UpdateTemplates(APIGatewayHttpApiV2ProxyRequest request)
+        public async Task<APIGatewayHttpApiV2ProxyResponse> UpdateTemplates(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var template = JsonSerializer.Deserialize<Template>(request.Body);
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var TableName = Environment.GetEnvironmentVariable("TABLE_NAME");
+            await dynamoDBContext.SaveAsync(template, new DynamoDBOperationConfig
+            {
+                OverrideTableName = TableName,
+            });
             return new APIGatewayHttpApiV2ProxyResponse
             {
-                StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Update Templates for Message - {request.RequestContext.Time}.",
+                StatusCode = (int)HttpStatusCode.Accepted,
+                Body = $"Update accepted for processing.",
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
