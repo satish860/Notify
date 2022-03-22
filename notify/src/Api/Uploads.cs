@@ -18,7 +18,12 @@ namespace Api
         public Uploads()
         {
             var region = RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION"));
-            s3Client = new AmazonS3Client(region);
+            AWSConfigsS3.UseSignatureVersion4 = true;
+            s3Client = new AmazonS3Client(new AmazonS3Config
+            {
+                RegionEndpoint = region,
+                
+            });
             bucketName = Environment.GetEnvironmentVariable("BUCKET_NAME");
         }
 
@@ -29,6 +34,7 @@ namespace Api
             {
                 BucketName = bucketName,
                 Key = serializer.FileName,
+                Verb = HttpVerb.PUT,
                 Expires = DateTime.UtcNow.AddHours(24)
             };
             string url = s3Client.GetPreSignedURL(preSignedUrlRequest);
