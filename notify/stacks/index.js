@@ -1,4 +1,5 @@
 import MyStack from "./MyStack";
+import QueueStack from "./QueueStack";
 import StorageStack from "./StorageStack";
 
 export default function main(app) {
@@ -8,6 +9,8 @@ export default function main(app) {
   });
   
   const storageStack = new StorageStack(app, "storage");
+  
+  new QueueStack(app,"WhatsappmessageQueue");
   new MyStack(app, "my-stack",{
     table: storageStack.table,
     bucket: storageStack.bucket
