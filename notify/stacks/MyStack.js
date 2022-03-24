@@ -4,15 +4,17 @@ export default class MyStack extends sst.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
     
-    const { table,bucket } = props;
+    const { table,bucket,notificationTable,queue } = props;
 
-
+    console.log(notificationTable);
     // Create a HTTP API
     const api = new sst.Api(this, "Api", {
       defaultFunctionProps: {
         environment:{
           TABLE_NAME: table.tableName,
-          BUCKET_NAME: bucket.bucketName
+          BUCKET_NAME: bucket.bucketName,
+          NOTIFICATION_TABLE:notificationTable.tableName,
+          queueUrl:queue.sqsQueue.queueUrl
         },
         srcPath: "src/Api",
       },
@@ -26,7 +28,7 @@ export default class MyStack extends sst.Stack {
         "POST    /notification": "Api::Api.NotificationHandler::CreateNotification"
       }
     });
-    api.attachPermissions([bucket])
+    api.attachPermissions([bucket,notificationTable,queue])
     // Show the endpoint in the output
     this.addOutputs({
       "ApiEndpoint": api.url,
