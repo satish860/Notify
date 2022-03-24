@@ -22,7 +22,8 @@ export default class MyStack extends sst.Stack {
         "Delete  /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DeleteTemplates",
         "Get     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DetailsTemplates",
         "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates",
-        "POST    /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl" 
+        "POST    /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl" ,
+        "POST    /notification": "Api::Api.NotificationHandler::CreateNotification"
       }
     });
     api.attachPermissions([bucket])
