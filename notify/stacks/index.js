@@ -1,6 +1,7 @@
 import MyStack from "./MyStack";
 import QueueStack from "./QueueStack";
 import StorageStack from "./StorageStack";
+import NotificationStorageStack from "./NotificationStorageStack";
 
 export default function main(app) {
   // Set default runtime for all functions
@@ -9,12 +10,12 @@ export default function main(app) {
   });
   
   const storageStack = new StorageStack(app, "storage");
-  
-  new QueueStack(app,"WhatsappmessageQueue");
   new MyStack(app, "my-stack",{
     table: storageStack.table,
     bucket: storageStack.bucket
   });
 
-  // Add more stacks
+  // Notification Stack
+  new QueueStack(app,"WhatsappmessageQueue");
+  new NotificationStorageStack(app,"notificationStorage");
 }
