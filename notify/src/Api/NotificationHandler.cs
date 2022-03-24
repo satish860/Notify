@@ -36,5 +36,15 @@ namespace Api
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
+
+        public APIGatewayHttpApiV2ProxyResponse GetNotification(APIGatewayHttpApiV2ProxyRequest request)
+        {
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Body = $"Create Templates for Message - {request.RequestContext.Time}.",
+                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
+            };
+        }
     }
 }

@@ -25,7 +25,8 @@ export default class MyStack extends sst.Stack {
         "Get     /templates/{user_id}/{template_id}": "Api::Api.TemplateHandler::DetailsTemplates",
         "Get     /templates/{user_id}": "Api::Api.TemplateHandler::ListTemplates",
         "POST    /upload-url/{user_id}": "Api::Api.Uploads::GetUploadUrl" ,
-        "POST    /notification": "Api::Api.NotificationHandler::CreateNotification"
+        "POST    /notification": "Api::Api.NotificationHandler::CreateNotification",
+        "GET     /notification/{user_id}": "Api::Api.NotificationHandler::GetNotification"
       }
     });
     api.attachPermissions([bucket,notificationTable,queue])
