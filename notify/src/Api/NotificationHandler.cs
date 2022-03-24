@@ -37,12 +37,22 @@ namespace Api
             };
         }
 
-        public APIGatewayHttpApiV2ProxyResponse GetNotification(APIGatewayHttpApiV2ProxyRequest request)
+        public async Task<APIGatewayHttpApiV2ProxyResponse> GetNotification(APIGatewayHttpApiV2ProxyRequest request)
         {
+            var userId = request.PathParameters["user_id"];
+            DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
+            var searchResult = dynamoDBContext.QueryAsync<Notification>(userId, operationConfig);
+            var templates = new List<Notification>();
+            do
+            {
+                List<Notification> nextSet = await searchResult.GetNextSetAsync();
+                templates.AddRange(nextSet);
+            }
+            while (!searchResult.IsDone);
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = $"Create Templates for Message - {request.RequestContext.Time}.",
+                Body = JsonSerializer.Serialize(templates),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
