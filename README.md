@@ -1,2 +1,2 @@
 # Notify
-A simply solution to notify customers using Whats app
+A simple solution to notify customers using Whats app
