@@ -10,9 +10,10 @@ namespace Api
 {
     public class NotificationProcessor
     {
-        public async Task FunctionHandler(SQSEvent sQSEvent,ILambdaContext lambdaContext)
+        public string FunctionHandler(SQSEvent sQSEvent,ILambdaContext lambdaContext)
         {
-            await Task.CompletedTask;
+            lambdaContext.Logger.Log("Consumer called with the message");
+            return "hello World";
         }
     }
 }

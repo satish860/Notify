@@ -2,6 +2,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.SQS;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -15,13 +16,16 @@ namespace Api
     {
         private readonly AmazonDynamoDBClient client;
         private readonly DynamoDBOperationConfig operationConfig;
+        private readonly IAmazonSQS amazonSQS;
         public NotificationHandler()
         {
-            client = new AmazonDynamoDBClient(RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION")));
+            var region = RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_REGION"));
+            client = new AmazonDynamoDBClient(region);
             operationConfig = new DynamoDBOperationConfig
             {
                 OverrideTableName = Environment.GetEnvironmentVariable("NOTIFICATION_TABLE")
             };
+            amazonSQS = new AmazonSQSClient(region);
         }
         public async Task<APIGatewayHttpApiV2ProxyResponse> CreateNotification(APIGatewayHttpApiV2ProxyRequest request)
         {
@@ -29,10 +33,13 @@ namespace Api
             DynamoDBContext dynamoDBContext = new DynamoDBContext(client);
             notification.NotificationId = Guid.NewGuid().ToString();
             await dynamoDBContext.SaveAsync(notification, operationConfig);
+            var url = Environment.GetEnvironmentVariable("queueUrl");
+            var body = JsonSerializer.Serialize(notification);
+            await amazonSQS.SendMessageAsync(url, body);
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = JsonSerializer.Serialize(notification),
+                Body = body,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
