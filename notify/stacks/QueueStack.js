@@ -6,7 +6,10 @@ export default class QueueStack extends sst.Stack{
         super(scope,id,props);
 
         this.queue = new sst.Queue(this,"WhatsAppMessageQueue",{
-            consumer:"Api::Api.NotificationProcessor::FunctionHandler"
+            consumer: {
+                handler: "Api::Api.NotificationProcessor::FunctionHandler",
+                srcPath:"src/Api"
+            }
         })
     }
 } 
